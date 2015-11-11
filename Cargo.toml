@@ -1,0 +1,10 @@
+[package]
+name = "network"
+version = "0.1.0"
+authors = ["Marco Draeger <draeger.marco@gmail.com>"]
+
+[[bin]]
+name = "test_network"
+
+[lib]
+name = "network"
