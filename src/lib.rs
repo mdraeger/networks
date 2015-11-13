@@ -1,19 +1,26 @@
 #![crate_name="network"]
 #![crate_type="lib"]
 
+use std::f64::{ INFINITY, NEG_INFINITY };
+
 pub mod compact_star;
 pub mod algorithms;
 mod collections;
+mod heaps;
 
 pub type DoubleVec = Vec<f64>;
+pub type Cost      = f64;
 pub type NodeId    = u32;
 pub type NodeVec   = Vec<NodeId>;
+
+pub const INF: Cost = INFINITY;
+pub const NEG_INF: Cost = NEG_INFINITY;
 
 pub trait Network {
     /// Returns a vec of adjecent nodes, identified by their id
     fn adjacent(&self, i: NodeId) -> Vec<NodeId>;
-    fn cost(&self, from: NodeId, to: NodeId) -> Option<f64>;
-    fn capacity(&self, from: NodeId, to: NodeId) -> Option<f64>;
+    fn cost(&self, from: NodeId, to: NodeId) -> Option<Cost>;
+    fn capacity(&self, from: NodeId, to: NodeId) -> Option<Cost>;
     fn num_nodes(&self) -> usize;
     fn num_arcs(&self) -> usize;
     /// Returns an invalid node id to be used as default/ stop value.
