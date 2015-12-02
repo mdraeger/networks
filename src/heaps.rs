@@ -21,12 +21,12 @@ pub struct BinaryHeap {
     inner_heap: RHeap<HeapMember>
 }
 impl BinaryHeap {
-    fn new() -> Self {
+    pub fn new() -> Self {
         BinaryHeap {
             inner_heap: RHeap::new()
         }
     }
-    fn with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(capacity: usize) -> Self {
         BinaryHeap {
             inner_heap: RHeap::with_capacity(capacity)
         }
@@ -67,7 +67,7 @@ pub struct FibonacciHeap {
 }
 
 impl FibonacciHeap {
-    fn new() -> Self {
+    pub fn new() -> Self {
         FibonacciHeap {
             min_elem: None,
             root: Vec::new(),
@@ -81,31 +81,41 @@ impl FibonacciHeap {
         }
     }
     fn merge_roots(&mut self) {
-        let root_degrees = &mut (vec![self.size; self.root.len()])[..]; // self.size is an invalid id
-        while self.not_all_different() {
-            for i in 0..self.root.len() {
-                let rank = self.root.get(i).unwrap().rank;
-                if root_degrees[rank] != self.size {
-                    self.link(root_degrees[rank], i);
-                    root_degrees[rank] = self.size;
-                    break;
-                } else {
-                    root_degrees[rank] = i;
+        let max_rank = self.size.next_power_of_two().trailing_zeros() as usize; // fancy way of ceil(ld(self.size))
+        let root_degrees = &mut (vec![self.size; max_rank])[..]; // self.size is an invalid id
+        if self.size > 0 {
+            println!("\tMerging roots, current size: {}", self.size);
+            while self.not_all_different(root_degrees) {
+                for i in 0..self.root.len() {
+                    let rank = self.root.get(i).unwrap().rank;
+                    if root_degrees[rank] != self.size {
+                        self.link(root_degrees[rank], i);
+                        root_degrees[rank] = self.size;
+                        break;
+                    } else {
+                        root_degrees[rank] = i;
+                    }
                 }
             }
         }
     }
     fn update_min(&mut self) {
-        let mut min_id = 0;
-        let mut min_cost = INF;
-        for i in 0..self.root.len() {
-            let current_cost = self.root.get(i).unwrap().heap_member.cost;
-            if current_cost < min_cost {
-                min_cost = current_cost;
-                min_id = i;
+        if self.size > 0 {
+            let mut min_id = 0;
+            let mut min_cost = INF;
+            for i in 0..self.root.len() {
+                let current_cost = self.root.get(i).unwrap().heap_member.cost;
+                if current_cost < min_cost {
+                    min_cost = current_cost;
+                    min_id = i;
+                }
+            }
+            if (self.root.len() > 0) {
+                self.min_elem = Some(self.root.remove(min_id))
+            } else {
+                self.min_elem = None
             }
         }
-        self.min_elem = Some(self.root.remove(min_id))
     }
     fn link(&mut self, i: usize, j: usize) {
         let mut elem_i = self.root.remove(i);
@@ -120,14 +130,14 @@ impl FibonacciHeap {
             self.root.push(elem_j);
         }
     }
-    fn not_all_different(&self) -> bool {
-        let root_degrees = &mut (vec![self.size; self.root.len()])[..]; // self.size is an invalid id
+    fn not_all_different(&self, ranks: &mut [usize]) -> bool {
+        println!("\t\tinside not_all_different: root_degrees: {:?}", ranks);
         for i in 0..self.root.len() {
             let rank = self.root.get(i).unwrap().rank;
-            if root_degrees[rank] != self.size {
+            if ranks[rank] != self.size {
                 return true;
             } else {
-                root_degrees[rank] = i;
+                ranks[rank] = i;
             }
         }
         false
@@ -163,10 +173,14 @@ impl Heap for FibonacciHeap {
     }
     fn delete_min(&mut self) {
         if ! self.is_empty() {
-            self.size -= 1;
+            println!("Deleting, step 1");
             self.remove_min();
+            println!("Deleting, step 2");
             self.merge_roots();
+            println!("Deleting, step 3");
             self.update_min();
+            println!("Deleting, done");
+            self.size -= 1;
         }
     }
 }
@@ -283,4 +297,26 @@ fn test_fibonacci_heap() {
     assert_eq!(Some(1), fibonacci_heap.find_min());
     fibonacci_heap.insert(0,0.0);
     assert_eq!(Some(0), fibonacci_heap.find_min());
+}
+
+#[test]
+fn test_fib_delete_min() {
+    let mut fibonacci_heap = FibonacciHeap::new();
+    fibonacci_heap.insert(0,0.0);
+    assert_eq!(Some(0), fibonacci_heap.find_min());
+    fibonacci_heap.delete_min();
+    assert_eq!(0, fibonacci_heap.size());
+}
+
+#[test]
+fn test_fib_insert_delete() {
+    let mut fibonacci_heap = FibonacciHeap::new();
+
+    fibonacci_heap.insert( 0, 0.0);
+    fibonacci_heap.insert( 1, 6.0);
+    fibonacci_heap.insert( 2, 4.0);
+    fibonacci_heap.delete_min();
+    fibonacci_heap.insert( 3, 5.0);
+    fibonacci_heap.insert( 4, 6.0);
+    fibonacci_heap.delete_min();
 }
