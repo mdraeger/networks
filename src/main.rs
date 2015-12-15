@@ -1,17 +1,28 @@
+extern crate docopt;
 extern crate network;
+extern crate regex;
+extern crate rustc_serialize;
 
 use network::{Capacity, Cost, NodeId};
 use network::compact_star::{compact_star_from_edge_vec};
 use network::algorithms::*;
+use regex::Regex;
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 use std::path::Path;
 
+mod usage;
+use usage::*;
+
 type Edge = (NodeId, NodeId, Cost, Capacity);
 
 fn main() {
+    let ref args = getArgs();
+    let reg_pattern = parse_pattern(&args.flag_pattern);
+    println!("{:?}", reg_pattern);
+    /*
     let args: Vec<String> = env::args().collect();
     let file_name = match args.len() {
         3 => &args[2],
@@ -57,6 +68,11 @@ fn main() {
         };
         println!("{} -> {}: {:.2}", from_name, to_name, cost_i);
     }
+    */
+}
+
+fn parse_pattern(p: &str) -> Regex {
+    Regex::new(p).ok().expect("Couldn't compile pattern.")
 }
 
 fn get_node_name(i: &NodeId, id_to_node: &HashMap<NodeId, String>) -> String {
@@ -115,7 +131,7 @@ fn help() {
 
 #[test]
 fn test_breadth_first_search() {
-    let test_edges = vec![(0,1,25.0,30.0),
+    let mut test_edges = vec![(0,1,25.0,30.0),
                           (0,2,35.0,50.0), 
                           (1,3,15.0,40.0),
                           (2,1,45.0,10.0),
@@ -123,12 +139,12 @@ fn test_breadth_first_search() {
                           (3,4,45.0,60.0),
                           (4,2,25.0,20.0),
                           (4,3,35.0,50.0)];
-    let compact_star = compact_star_from_edge_vec(5, test_edges);
+    let compact_star = compact_star_from_edge_vec(5, &mut test_edges);
 
     println!("breadth first search: {:?}", breadth_first_search(&compact_star, 0));
     println!("depth first search: {:?}", depth_first_search(&compact_star, 0));
 
-    let test_edges = vec![
+    let mut test_edges = vec![
         (0,1,6.0,0.0),
         (0,2,4.0,0.0),
         (1,2,2.0,0.0),
@@ -138,6 +154,19 @@ fn test_breadth_first_search() {
         (3,5,7.0,0.0),
         (4,3,1.0,0.0),
         (4,5,3.0,0.0)];
-    let compact_star = compact_star_from_edge_vec(6, test_edges);
+    let compact_star = compact_star_from_edge_vec(6, &mut test_edges);
     println!("breadth first search: {:?}", heap_dijkstra(&compact_star, 0));
+}
+
+#[test]
+fn test_pattern_match() {
+    let pattern = r"^(?P<from>[[:alnum:]]*\*??)(?P<to>[[:alnum:]]+)\s?(?P<cost>\d??\*??\d??).*$";
+    // let pattern = r"^(?P<from>[:alnum:-_]+)\.(?P<to>[:alnum:-_]+).*$";
+    // let pattern = r"^(?P<from>[:alnum:-_]+)\\.(?P<to>[:alnum:-_]+)\\s+(?P<cost>\\d+\\.??\d+).+$";
+    let regex = parse_pattern(pattern);
+    let to_match = "nW0770230N0388068.nW0770230N0388073   000.0345 065 11 {DC}";
+    assert!(regex.is_match(to_match));
+    let caps = regex.captures(to_match).unwrap();
+    assert_eq!(Some("nW0770230N0388073"), caps.at(2)); 
+    assert_eq!(Some("nW0770230N0388068"), caps.at(1)); 
 }

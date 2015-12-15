@@ -116,7 +116,7 @@ impl Network for CompactStar {
 /// * `edges` - (from, to, cost (length), capacity) tuples. These will be sorted by from-node
 /// before building the compact star.
 pub fn compact_star_from_edge_vec(nodes: usize, edges: &mut Vec<(NodeId, NodeId, Cost, Capacity)>) -> CompactStar {
-    edges.sort_by(|&(n0, n1, _, _), &(o0, o1, _, _)| n0.cmp(&o0));
+    edges.sort_by(|&(n0, _, _, _), &(o0, _, _, _)| n0.cmp(&o0));
     let mut compact_star = CompactStar::new(nodes, edges.len());
     let mut tail_index = 0;
     let mut point_index = 0;
@@ -214,7 +214,7 @@ fn test_compact_star_from_edge_vec() {
     for v in vec![0,3,1,4,6,2,7,5] { comp_star_1.trace.push(v); }
     comp_star_1.cost_sum = 240.0;
 
-    let edges = vec![(0,1,25.0,30.0),
+    let mut edges = vec![(0,1,25.0,30.0),
                      (0,2,35.0,50.0),
                      (1,3,15.0,40.0),
                      (2,1,45.0,10.0),
@@ -222,14 +222,14 @@ fn test_compact_star_from_edge_vec() {
                      (3,4,45.0,60.0),
                      (4,2,25.0,20.0),
                      (4,3,35.0,50.0)];
-    let comp_star_2 = compact_star_from_edge_vec(5, edges);
+    let comp_star_2 = compact_star_from_edge_vec(5, &mut edges);
     
     assert_eq!(comp_star_1, comp_star_2);
 }
 
 #[test]
 fn test_compact_start_from_edge_vec2() {
-    let edges = vec![
+    let mut edges = vec![
         (0,1,6.0,0.0),
         (0,2,4.0,0.0),
         (1,2,2.0,0.0),
@@ -239,7 +239,7 @@ fn test_compact_start_from_edge_vec2() {
         (3,5,7.0,0.0),
         (4,3,1.0,0.0),
         (4,5,3.0,0.0)];
-    let compact_star = compact_star_from_edge_vec(6, edges);
+    let compact_star = compact_star_from_edge_vec(6, &mut edges);
     assert_eq!(6, compact_star.num_nodes());
     assert_eq!(vec![0,2,4,6,7,9,9], compact_star.point);
 }

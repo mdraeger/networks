@@ -8,3 +8,9 @@ name = "test_network"
 
 [lib]
 name = "network"
+
+[dependencies]
+regex = "*"
+time  = "*"
+docopt = "*"
+rustc-serialize = "*"
