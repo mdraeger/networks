@@ -1,7 +1,7 @@
-use super::{Cost, DoubleVec, Network, NodeId, NodeVec};
-use super::collections::{Collection, Queue, Stack};
-use super::compact_star::compact_star_from_edge_vec;
-use super::heaps::{ BinaryHeap, Heap };
+use super::super::{Cost, DoubleVec, Network, NodeId, NodeVec};
+use super::super::collections::{Collection, Queue, Stack};
+use super::super::compact_star::compact_star_from_edge_vec;
+use super::super::heaps::{ BinaryHeap, Heap };
 
 /// Returns a tuple of node id lists as result of a Breadth-First search from node `start`. 
 /// The first list is the predecessor list, that matches each node to it's predecessor in the
@@ -84,7 +84,15 @@ fn search<C: Collection, N: Network>(network: &N, to_process: &mut C, start: Nod
     (pred, order)
 }
 
-pub fn dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, DoubleVec) {
+pub fn dijkstra<N: Network>(network: &N, source: NodeId, use_heap: bool) -> (NodeVec, DoubleVec) {
+  if use_heap {
+    heap_dijkstra(network, source)
+  } else {
+    vanilla_dijkstra(network, source)
+  }
+}
+
+pub fn vanilla_dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, DoubleVec) {
     let n = network.num_nodes();
 
     let mut temporary = NodeVec::with_capacity(n);
@@ -122,7 +130,7 @@ pub fn dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, DoubleVec)
 }
 
 fn find_min(to_check: &NodeVec, distances: &[Cost]) -> NodeId {
-    let mut min = super::INF;
+    let mut min = super::super::INF;
     let mut min_id = distances.len() as NodeId; // is invalid
     for node in to_check {
         let index = *node as usize;
@@ -201,7 +209,7 @@ fn test_dijkstra() {
         (4,3,1.0,0.0),
         (4,5,3.0,0.0)];
     let compact_star = compact_star_from_edge_vec(6, &mut edges);
-    let (pred, dist) = dijkstra(&compact_star, 0);
+    let (pred, dist) = dijkstra(&compact_star, 0, false);
     assert_eq!(6, pred.len());
     assert_eq!(6, dist.len());
     assert_eq!(vec![6,0,0,2,2,4], pred);
@@ -221,7 +229,7 @@ fn test_heap_dijkstra() {
         (4,3,1.0,0.0),
         (4,5,3.0,0.0)];
     let compact_star = compact_star_from_edge_vec(6, &mut edges);
-    let (pred, dist) = heap_dijkstra(&compact_star, 0);
+    let (pred, dist) = dijkstra(&compact_star, 0, true);
     assert_eq!(6, pred.len());
     assert_eq!(6, dist.len());
     assert_eq!(vec![6,0,0,2,2,4], pred);
