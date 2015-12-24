@@ -53,6 +53,8 @@ fn build_adj_list<N: Network>(network: &N) -> Vec<Vec<usize>> {
 
 /// Normalize the vector to \sum_i v_i = 1. Remaining mass is distributed 
 /// evenly over all nodes. (Also known as smoothing.)
+/// # Panics
+/// If the sum of all elements is greater than `1.0`
 fn normalize(vector: &mut Vec<f64>) {
   let mut sum = 0.0;
   for i in 0..vector.len() {
