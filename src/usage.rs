@@ -2,6 +2,8 @@ use docopt::Docopt;
 use alg_runner::Algorithm;
 use network::NodeId;
 
+pub const DEFAULT_EPS: f64 = 1e-6;
+pub const DEFAULT_BETA: f64 = 0.2;
 pub const DEFAULT_PATTERN: &'static str = "^(?P<from>[[:alnum:]]+).(?P<to>[[:alnum:]]+)\\s+(?P<cost>\\d+.\\d+).*$";
 pub const DEFAULT_SKIP: usize = 0;
 pub const DEFAULT_START_ID: NodeId = 0;
@@ -22,7 +24,8 @@ Options:
     --skip=<s>            Number of header lines in the input file. Defaults to zero.
     --start_node=<name>   The node name from which to search in a search algorithm like Dijkstra, Breadth-First-Search, or Depth-First-Search. Defaults to the first parsed node name.
     --use-heap            Whether to use a heap to process Dijkstra's shortest path algorithm.
-    --beta=<beta>         For PageRank, the teleportation probability parameter. Must be a double value in [0.0, 1.0]
+    --beta=<beta>         For PageRank, the teleportation probability parameter. Must be a double value in [0.0, 1.0]. Defaults to 0.2.
+    --eps=<eps>           For PageRank and other numeric algorithms, the convergence parameter. Defaults to 1e-6.
 ";
 
 #[derive(Debug, RustcDecodable)]
@@ -35,6 +38,7 @@ pub struct Args {
     pub flag_start_node: Option<String>,
     pub flag_use_heap: bool,
     pub flag_beta: Option<f64>,
+    pub flag_eps: Option<f64>,
 }
 
 pub fn getArgs() -> Args {

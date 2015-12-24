@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use network::{ DoubleVec, Network, NodeId };
-use network::algorithms::{dijkstra};
-use usage::{ DEFAULT_START_ID, Args };
+use network::algorithms::{ dijkstra, pagerank };
+use usage::{ DEFAULT_BETA, DEFAULT_EPS, DEFAULT_START_ID, Args };
 
 #[derive(Debug, RustcDecodable)]
 pub enum Algorithm { dijkstra, pagerank }
@@ -24,7 +24,11 @@ fn run_dijkstra<N: Network>(network: &N, args: &Args, node_to_id: &HashMap<Strin
   print_dijkstra_result(&pred, &cost, &node_to_id)
 }
 
-fn run_pagerank<N: Network>(network: &N, args: &Args, id_to_node: &HashMap<String, NodeId>) {
+fn run_pagerank<N: Network>(network: &N, args: &Args, node_to_id: &HashMap<String, NodeId>) {
+  let beta = args.flag_beta.unwrap_or(DEFAULT_BETA);
+  let eps = args.flag_eps.unwrap_or(DEFAULT_EPS);
+  let ranks = pagerank(network, beta, eps);
+  print_pagerank_results(&ranks, node_to_id);
 }
 
 fn get_node_name(i: &NodeId, id_to_node: &HashMap<NodeId, String>) -> String {
@@ -42,4 +46,7 @@ fn print_dijkstra_result(pred: &Vec<NodeId>, cost: &DoubleVec, node_to_id: &Hash
      let cum_cost = cost.get(i).unwrap();
      println!("{} -> {} : {:4}", from_node, to_node, cum_cost);
   }
+}
+
+fn print_pagerank_results(ranks: &Vec<f64>, node_to_id: &HashMap<String, NodeId>) {
 }

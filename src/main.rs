@@ -46,7 +46,6 @@ fn main() {
 
     run_algorithm(&compact_star, args, &node_to_id);
     let max_node_id = node_to_id.values().max().unwrap();
-    println!("number of distinct nodes: {}, {}", num_nodes, max_node_id);
 }
 
 #[test]
