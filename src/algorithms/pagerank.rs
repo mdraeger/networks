@@ -1,5 +1,13 @@
 use super::super::{ Network, NodeId };
 
+/// Runs pagerank algorithm on a graph until convergence.
+/// Convergence is reached, when the last ranks vector and the new one
+/// differ by less than `eps` in their L1-norm.
+/// `beta` is the teleport probability. CAUTION: Never use a teleport 
+/// probability of `beta == 0.0`!!! Due to precision errors in the double
+/// values, the sum of the ranks vector elements can exceed `1.0` which
+/// will be caught by an assertion and the algorithm will panic.  
+/// The result will be the pagerank for each node in the network.
 pub fn pagerank<N: Network>(network: &N, beta: f64, eps: f64) -> Vec<f64> {
   let init_value = 1.0 / (network.num_nodes() as f64);
   let mut ranks = vec![0.0; network.num_nodes()];
@@ -13,7 +21,9 @@ pub fn pagerank<N: Network>(network: &N, beta: f64, eps: f64) -> Vec<f64> {
   } 
   ranks
 }
-
+/// Calculates the inverse of the out degree for each node in the network.
+/// For out degree `0`, the inverse will also be `0`, guaranteeing that we 
+/// add `0.0` to the pagerank of the respective node.
 fn inv_out_deg<N: Network>(network: &N) -> Vec<f64> {
   let mut inv_out_deg = Vec::with_capacity(network.num_nodes());
   for i in 0..network.num_nodes() {
@@ -27,6 +37,7 @@ fn inv_out_deg<N: Network>(network: &N) -> Vec<f64> {
   inv_out_deg
 }
 
+/// Converts the network in a slightly faster traversable adjacency list.
 fn build_adj_list<N: Network>(network: &N) -> Vec<Vec<usize>> {
   let mut adj_list = Vec::with_capacity(network.num_nodes());
   for i in 0..network.num_nodes() {
@@ -40,6 +51,8 @@ fn build_adj_list<N: Network>(network: &N) -> Vec<Vec<usize>> {
   adj_list
 }
 
+/// Normalize the vector to \sum_i v_i = 1. Remaining mass is distributed 
+/// evenly over all nodes. (Also known as smoothing.)
 fn normalize(vector: &mut Vec<f64>) {
   let mut sum = 0.0;
   for i in 0..vector.len() {
@@ -53,6 +66,8 @@ fn normalize(vector: &mut Vec<f64>) {
   }
 }
 
+/// Multiply the ranks vector with the adjacency matrix. Every entry is 
+/// damped by `1.0 - beta`. The vector is multiplied from the left!
 fn mult_matrix_vec(adj_list: &Vec<Vec<usize>>, inv_out_degs: &Vec<f64>, beta: f64, current: &Vec<f64>) -> Vec<f64> {
   let mut new_ranks = vec![0.0; current.len()];
   for source_node in 0..current.len() {
@@ -64,6 +79,7 @@ fn mult_matrix_vec(adj_list: &Vec<Vec<usize>>, inv_out_degs: &Vec<f64>, beta: f6
   new_ranks
 }
 
+/// Determines convergence for two vectors with respect to the tolerance.
 fn is_converged(old: &Vec<f64>, new: &Vec<f64>, eps: f64) -> bool {
   assert!(old.len() == new.len());
   let mut sum = 0.0;
