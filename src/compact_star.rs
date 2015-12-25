@@ -169,7 +169,7 @@ pub fn compact_star_from_edge_vec(nodes: usize, edges: &mut Vec<(NodeId, NodeId,
     compact_star
 }
 
-// ====================================== TESTS ================================================
+// ================================= TESTS ====================================
 
 #[test]
 fn access() {

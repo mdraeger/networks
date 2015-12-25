@@ -6,6 +6,8 @@ use std::path::Path;
 
 use network::{Capacity, Cost, NodeId};
 
+/// Describes one edge (arc) in a network, regardless of actual network
+/// implementation.
 pub type Edge = (NodeId, NodeId, Cost, Capacity);
 
 fn parse_pattern(p: &str) -> Regex {
@@ -46,12 +48,16 @@ fn parse_line(line: &str, regex: &Regex, node_to_id: &mut HashMap<String, NodeId
 }
 
 fn inc_node_counter(next_node: &mut NodeId) -> NodeId {
-  unsafe {
-    *next_node += 1;
-    *next_node - 1
-  }
+  *next_node += 1;
+  *next_node - 1
 }
 
+/// Read a list of edges from a file.
+///
+/// Every line has to match the pattern `pattern` and the number of header
+/// lines is determined by the `skip` parameter.
+///
+/// The result is stored in a mutable vector with correct `Edge` type.
 pub fn edges_from_file<P>(filename: P, pattern: &str, is_undirected: &bool, skip: usize, node_to_id: &mut HashMap<String,NodeId>, edges: &mut Vec<Edge>) 
         where P: AsRef<Path> {
     let regex = parse_pattern(pattern);

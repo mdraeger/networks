@@ -130,11 +130,11 @@ pub fn vanilla_dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, Do
 }
 
 fn find_min(to_check: &NodeVec, distances: &[Cost]) -> NodeId {
-    let mut min = super::super::INF;
+    let mut min = distances[0];
     let mut min_id = distances.len() as NodeId; // is invalid
     for node in to_check {
         let index = *node as usize;
-        if distances[index] < min {
+        if distances[index] <= min {
             min_id = *node;
             min = distances[index];
         }

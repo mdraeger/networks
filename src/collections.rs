@@ -1,6 +1,10 @@
 use std::collections::VecDeque;
 use super::NodeId;
 
+/// Provides a common interface for stacks and queues, hiding the actual
+/// implementation. This implementation allows to turn breadth-first-search
+/// into depth-first-search just by providing a different collection for 
+/// intermediate nodes.
 pub trait Collection {
     fn new() -> Self;
     fn with_capacity(init_cap: usize) -> Self;

@@ -1,8 +1,11 @@
 use std::cmp::{Ord, Ordering};
 use std::collections::BinaryHeap as RHeap;
-use super::{ Cost, NodeId, INF, NEG_INF };
+use super::{ Cost, NodeId };
 
 /// minimalistic heap trait restricted for `(NodeId, Cost)` tuples
+/// 
+/// It provides a more common interface than the original Rust implementation
+/// suggests.
 pub trait Heap {
     /// Find the min element in `O(1)` time.
     fn find_min(&self) -> Option<NodeId>;
@@ -46,6 +49,8 @@ impl Heap for BinaryHeap {
     fn is_empty(&self) -> bool {
         self.inner_heap.is_empty()
     }
+    /// Inserts a node with cost `-cost`. This turns the standard max heap
+    /// as implemented in the Rust standard library into a min heap.
     fn insert(&mut self, node_id: NodeId, cost: Cost) {
         self.inner_heap.push(HeapMember { key: node_id, cost: -cost }) // rust heap is a max heap
     }

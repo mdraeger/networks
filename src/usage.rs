@@ -41,7 +41,7 @@ pub struct Args {
     pub flag_eps: Option<f64>,
 }
 
-pub fn getArgs() -> Args {
+pub fn get_args() -> Args {
     let args: Args = Docopt::new(USAGE)
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());

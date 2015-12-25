@@ -22,7 +22,7 @@ use network::algorithms::{ breadth_first_search, depth_first_search, heap_dijkst
 use network::compact_star::{ compact_star_from_edge_vec };
 
 mod usage;
-use usage::{ Args, getArgs, DEFAULT_PATTERN, DEFAULT_SKIP };
+use usage::{ get_args, DEFAULT_PATTERN, DEFAULT_SKIP };
 
 mod parse_text;
 use parse_text::{ Edge, edges_from_file };
@@ -31,7 +31,7 @@ mod alg_runner;
 use alg_runner::run_algorithm;
 
 fn main() {
-    let ref args = getArgs();
+    let ref args = get_args();
     let pattern = &args.flag_pattern
                        .as_ref()
                        .unwrap_or(&DEFAULT_PATTERN.to_string())
