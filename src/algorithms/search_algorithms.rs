@@ -1,6 +1,5 @@
 use super::super::{Cost, DoubleVec, Network, NodeId, NodeVec};
 use super::super::collections::{Collection, Queue, Stack};
-use super::super::compact_star::compact_star_from_edge_vec;
 use super::super::heaps::{ BinaryHeap, Heap };
 
 /// Returns a tuple of node id lists as result of a Breadth-First search from node `start`. 
@@ -85,11 +84,11 @@ fn search<C: Collection, N: Network>(network: &N, to_process: &mut C, start: Nod
 }
 
 pub fn dijkstra<N: Network>(network: &N, source: NodeId, use_heap: bool) -> (NodeVec, DoubleVec) {
-  if use_heap {
-    heap_dijkstra(network, source)
-  } else {
-    vanilla_dijkstra(network, source)
-  }
+    if use_heap {
+        heap_dijkstra(network, source)
+    } else {
+        vanilla_dijkstra(network, source)
+    }
 }
 
 pub fn vanilla_dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, DoubleVec) {
@@ -146,7 +145,7 @@ fn find_min_index(list: &NodeVec, node: NodeId) -> usize {
     let mut index = 0;
     for i in 0..list.len() {
         if list.get(i) == Some(&node) {
-           index = i;
+            index = i;
         }
     }
     index
@@ -198,6 +197,7 @@ pub fn heap_dijkstra<N: Network> (network: &N, source: NodeId) -> (NodeVec, Doub
 
 #[test]
 fn test_dijkstra() {
+    use super::super::compact_star::compact_star_from_edge_vec;
     let mut edges = vec![
         (0,1,6.0,0.0),
         (0,2,4.0,0.0),
@@ -218,6 +218,7 @@ fn test_dijkstra() {
 
 #[test]
 fn test_heap_dijkstra() {
+    use super::super::compact_star::compact_star_from_edge_vec;
     let mut edges = vec![
         (0,1,6.0,0.0),
         (0,2,4.0,0.0),

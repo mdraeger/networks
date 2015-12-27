@@ -41,7 +41,7 @@ impl CompactStar {
             Some(value) => value as usize,
             None => return None
         };
-    
+
         for index in lower..upper {
             if self.head.get(index).map(|p| *p).unwrap() == to {
                 return Some(index as NodeId);
@@ -71,7 +71,7 @@ impl Network for CompactStar {
             Some(value) => value as usize,
             None => return adj
         };
-    
+
         for index in lower..upper {
             adj.push(self.head.get(index).unwrap().to_owned());
         }
@@ -94,7 +94,7 @@ impl Network for CompactStar {
             n
         }
     }
-    
+
     fn num_arcs(&self) -> usize {
         self.tail.len()
     }
@@ -122,7 +122,7 @@ pub fn compact_star_from_edge_vec(nodes: usize, edges: &mut Vec<(NodeId, NodeId,
     let mut point_index = 0;
 
     let mut in_nodes: HashMap<NodeId, NodeVec> = HashMap::with_capacity(nodes);
-    
+
     compact_star.point.push(tail_index);
     let mut edge_iter = edges.iter();
     loop {
@@ -135,7 +135,7 @@ pub fn compact_star_from_edge_vec(nodes: usize, edges: &mut Vec<(NodeId, NodeId,
         compact_star.costs.push(cost);
         compact_star.cost_sum += cost;
         compact_star.capacities.push(cap);
-        
+
         while point_index < from  {
             compact_star.point.push(tail_index);
             point_index += 1;
@@ -215,15 +215,15 @@ fn test_compact_star_from_edge_vec() {
     comp_star_1.cost_sum = 240.0;
 
     let mut edges = vec![(0,1,25.0,30.0),
-                     (0,2,35.0,50.0),
-                     (1,3,15.0,40.0),
-                     (2,1,45.0,10.0),
-                     (3,2,15.0,30.0),
-                     (3,4,45.0,60.0),
-                     (4,2,25.0,20.0),
-                     (4,3,35.0,50.0)];
+    (0,2,35.0,50.0),
+    (1,3,15.0,40.0),
+    (2,1,45.0,10.0),
+    (3,2,15.0,30.0),
+    (3,4,45.0,60.0),
+    (4,2,25.0,20.0),
+    (4,3,35.0,50.0)];
     let comp_star_2 = compact_star_from_edge_vec(5, &mut edges);
-    
+
     assert_eq!(comp_star_1, comp_star_2);
 }
 

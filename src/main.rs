@@ -33,13 +33,13 @@ use alg_runner::run_algorithm;
 fn main() {
     let ref args = get_args();
     let pattern = &args.flag_pattern
-                       .as_ref()
-                       .unwrap_or(&DEFAULT_PATTERN.to_string())
-                       .clone();
+        .as_ref()
+        .unwrap_or(&DEFAULT_PATTERN.to_string())
+        .clone();
     let skip = args.flag_skip.unwrap_or(DEFAULT_SKIP);
     let file_name = &args.arg_filename;
     let is_undirected = &args.flag_undirected;
-    
+
     let mut node_to_id: HashMap<String, NodeId> = HashMap::new();
     let mut edges: Vec<Edge> = Vec::new();
 
@@ -59,13 +59,13 @@ fn main() {
 #[test]
 fn test_breadth_first_search() {
     let mut test_edges = vec![(0,1,25.0,30.0),
-                          (0,2,35.0,50.0), 
-                          (1,3,15.0,40.0),
-                          (2,1,45.0,10.0),
-                          (3,2,15.0,30.0),
-                          (3,4,45.0,60.0),
-                          (4,2,25.0,20.0),
-                          (4,3,35.0,50.0)];
+    (0,2,35.0,50.0), 
+        (1,3,15.0,40.0),
+        (2,1,45.0,10.0),
+        (3,2,15.0,30.0),
+        (3,4,45.0,60.0),
+        (4,2,25.0,20.0),
+        (4,3,35.0,50.0)];
     let compact_star = compact_star_from_edge_vec(5, &mut test_edges);
 
     println!("breadth first search: {:?}", breadth_first_search(&compact_star, 0));
