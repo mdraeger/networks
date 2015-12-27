@@ -89,10 +89,10 @@ fn is_converged(old: &Vec<f64>, new: &Vec<f64>, eps: f64) -> bool {
   assert!(old.len() == new.len());
   let mut sum = 0.0;
   for i in 0..old.len() {
-    sum += (old[i] - new[i]).abs();
+    sum += (old[i] - new[i]).powi(2);
   }
-  println!("{:e} ({:e})", sum, eps);
-  sum <= eps
+  println!("{:e} ({:e})", sum.sqrt(), eps);
+  sum.sqrt() <= eps
 }
 
 #[test]
