@@ -14,10 +14,13 @@ pub fn pagerank<N: Network>(network: &N, beta: f64, eps: f64) -> Vec<f64> {
   let mut new_ranks = vec![init_value; network.num_nodes()];
   let adj_lists = build_adj_list(network);
   let inv_out_deg = inv_out_deg(network);
+  let mut i = 0;
   while !is_converged(&ranks, &new_ranks, eps) {
+    print!("iteration {}: ", i);
     ranks = new_ranks;
     new_ranks = mult_matrix_vec(&adj_lists, &inv_out_deg, beta, &ranks);
     normalize(&mut new_ranks);
+    i+=1;
   } 
   ranks
 }
@@ -88,6 +91,7 @@ fn is_converged(old: &Vec<f64>, new: &Vec<f64>, eps: f64) -> bool {
   for i in 0..old.len() {
     sum += (old[i] - new[i]).abs();
   }
+  println!("{:e} ({:e})", sum, eps);
   sum <= eps
 }
 
@@ -154,6 +158,6 @@ fn test_pagerank() {
       (3,0,0.0,0.0),
       (3,2,0.0,0.0)];
   let compact_star = compact_star_from_edge_vec(4, &mut edges);
-  let ranks = pagerank(&compact_star, 0.2, 1e-3);
+  let ranks = pagerank(&compact_star, 1e-10,1e-3);
   assert_eq!(vec![0.38,0.12,0.29,0.19], ranks);
 }

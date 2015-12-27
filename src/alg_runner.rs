@@ -28,7 +28,8 @@ fn run_pagerank<N: Network>(network: &N, args: &Args, node_to_id: &HashMap<Strin
   let beta = args.flag_beta.unwrap_or(DEFAULT_BETA);
   let eps = args.flag_eps.unwrap_or(DEFAULT_EPS);
   let ranks = pagerank(network, beta, eps);
-  print_pagerank_results(&ranks, node_to_id);
+  let target_node = args.flag_target_node.as_ref();
+  print_pagerank_results(&ranks, node_to_id, target_node);
 }
 
 fn get_node_name(i: &NodeId, id_to_node: &HashMap<NodeId, String>) -> String {
@@ -48,5 +49,12 @@ fn print_dijkstra_result(pred: &Vec<NodeId>, cost: &DoubleVec, node_to_id: &Hash
   }
 }
 
-fn print_pagerank_results(ranks: &Vec<f64>, node_to_id: &HashMap<String, NodeId>) {
+fn print_pagerank_results(ranks: &Vec<f64>, node_to_id: &HashMap<String, NodeId>, target_node: Option<&String>) {
+    match target_node {
+        None => println!("No target node given."),
+        Some(name) => {
+            let id = node_to_id[name] as usize;
+            println!("Rank of node {}: {} ({:e})", name, ranks[id], ranks[id]);
+        }
+    }
 }

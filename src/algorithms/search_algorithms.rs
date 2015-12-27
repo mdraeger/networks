@@ -105,7 +105,7 @@ pub fn vanilla_dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, Do
     d[source as usize] = 0.0;
 
     while permanent.len() < n {
-        let next_node = find_min(&temporary, d);
+        let next_node = find_min(&temporary, d, network.infinity());
         let index_in_temporary = find_min_index(&temporary, next_node);
         permanent.push(temporary.remove(index_in_temporary));
         for adjacent_node in network.adjacent(next_node) {
@@ -129,8 +129,8 @@ pub fn vanilla_dijkstra<N: Network>(network: &N, source: NodeId) -> (NodeVec, Do
     (pred_vec, dist_vec)
 }
 
-fn find_min(to_check: &NodeVec, distances: &[Cost]) -> NodeId {
-    let mut min = distances[0];
+fn find_min(to_check: &NodeVec, distances: &[Cost], inf: Cost) -> NodeId {
+    let mut min = inf;
     let mut min_id = distances.len() as NodeId; // is invalid
     for node in to_check {
         let index = *node as usize;
